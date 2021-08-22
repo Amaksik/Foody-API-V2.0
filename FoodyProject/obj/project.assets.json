@@ -1237,11 +1237,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Antony\\Desktop\\FoodyAPI\\FoodyProject\\FoodyProject.csproj",
+      "projectUniqueName": "C:\\Users\\Antony\\Desktop\\Foody-API-V2.0\\FoodyProject\\FoodyProject.csproj",
       "projectName": "FoodyProject",
-      "projectPath": "C:\\Users\\Antony\\Desktop\\FoodyAPI\\FoodyProject\\FoodyProject.csproj",
+      "projectPath": "C:\\Users\\Antony\\Desktop\\Foody-API-V2.0\\FoodyProject\\FoodyProject.csproj",
       "packagesPath": "C:\\Users\\Antony\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Antony\\Desktop\\FoodyAPI\\FoodyProject\\obj\\",
+      "outputPath": "C:\\Users\\Antony\\Desktop\\Foody-API-V2.0\\FoodyProject\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Antony\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -1258,8 +1258,8 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "C:\\Users\\Antony\\Desktop\\FoodyAPI\\Foody.BLL\\Foody.BLL.csproj": {
-              "projectPath": "C:\\Users\\Antony\\Desktop\\FoodyAPI\\Foody.BLL\\Foody.BLL.csproj"
+            "C:\\Users\\Antony\\Desktop\\Foody-API-V2.0\\Foody.BLL\\Foody.BLL.csproj": {
+              "projectPath": "C:\\Users\\Antony\\Desktop\\Foody-API-V2.0\\Foody.BLL\\Foody.BLL.csproj"
             }
           }
         }

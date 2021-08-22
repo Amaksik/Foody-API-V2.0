@@ -833,11 +833,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Antony\\Desktop\\FoodyAPI\\Foody.DAL\\Foody.DAL.csproj",
+      "projectUniqueName": "C:\\Users\\Antony\\Desktop\\Foody-API-V2.0\\Foody.DAL\\Foody.DAL.csproj",
       "projectName": "Foody.DAL",
-      "projectPath": "C:\\Users\\Antony\\Desktop\\FoodyAPI\\Foody.DAL\\Foody.DAL.csproj",
+      "projectPath": "C:\\Users\\Antony\\Desktop\\Foody-API-V2.0\\Foody.DAL\\Foody.DAL.csproj",
       "packagesPath": "C:\\Users\\Antony\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Antony\\Desktop\\FoodyAPI\\Foody.DAL\\obj\\",
+      "outputPath": "C:\\Users\\Antony\\Desktop\\Foody-API-V2.0\\Foody.DAL\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Antony\\AppData\\Roaming\\NuGet\\NuGet.Config",

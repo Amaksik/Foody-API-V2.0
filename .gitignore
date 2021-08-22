@@ -77,4 +77,5 @@ _[Ss]cripts
 ######################
 # other files #
 ######################
-/vs.*
+vs/
+.Constants
