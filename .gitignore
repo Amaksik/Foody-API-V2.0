@@ -78,4 +78,4 @@ _[Ss]cripts
 # other files #
 ######################
 .vs/
-.Constants.cs
+.Foody.BLL/Constants.cs
