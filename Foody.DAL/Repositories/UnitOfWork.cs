@@ -9,22 +9,18 @@ using System.Threading.Tasks;
 
 namespace Foody.DAL.Repositories
 {
-    public class UnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
 
         private APIContext dbcontext;
         private UserRepository userRepository;
 
        //
-       public UnitOfWork()
-        {
-            dbcontext = new APIContext();
-        }
+       public UnitOfWork(string connectionString)
+       {
+            dbcontext = new APIContext(connectionString);
+       }
         //
-        public UnitOfWork(string connectionString)
-        {
-            dbcontext = new APIContext();
-        }
         public IUserRepository Users
         {
             get

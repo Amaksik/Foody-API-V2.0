@@ -18,12 +18,12 @@ namespace Foody.BLL.Clients
         private static readonly string codeEndpoint = @"search/item?upc=";
         private static readonly string consumeEndpoint = @"natural/nutrients";
 
-        public BarCodeClient()
+        public BarCodeClient(string BarcodeAPI_id, string BarcodeAPI_key)
         {
             httpClient = new HttpClient();
             APIUrl = @"https://trackapi.nutritionix.com/v2/";
-            apiID = Constants.BarcodeAPI_id;
-            Token = Constants.BarcodeAPI_key;
+            apiID = BarcodeAPI_id;
+            Token = BarcodeAPI_key;
 
             httpClient.DefaultRequestHeaders.Add("x-app-id", apiID);
             httpClient.DefaultRequestHeaders.Add("x-app-key", Token);

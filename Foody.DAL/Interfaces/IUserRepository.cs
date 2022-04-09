@@ -9,19 +9,18 @@ namespace Foody.DAL.Interfaces
 {
     public interface IUserRepository
     {
-        IEnumerable<User> GetAll();
+        Task<IEnumerable<User>> GetAll();
 
-        User Get(int id);
+        Task<User> Get(int id);
 
-        IEnumerable<Product> Favourites(int id);
-        IEnumerable<DayIntake> Statistics(int id);
+        Task<IEnumerable<Product>> Favourites(int id);
+        Task<IEnumerable<DayIntake>> Statistics(int id);
+        Task<IEnumerable<DayIntake>> Consume(int id, double amount);
 
         void Create(User item);
         void Update(User item);
         void Update(User item, Product product, bool ToAdd);
-
         void Delete(int id);
-
 
     }
 }

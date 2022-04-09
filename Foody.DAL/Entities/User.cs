@@ -26,7 +26,7 @@ namespace Foody.DAL.Entities
 
         public void RemoveProduct(Product p)
         {
-            this.Favourite.Remove(p);
+            Favourite.Remove(p);
         }
 
     }

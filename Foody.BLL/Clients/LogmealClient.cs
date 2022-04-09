@@ -16,11 +16,11 @@ namespace Foody.BLL.Clients
     {
 
 
-        public LogmealClient()
+        public LogmealClient(string Logmeal_bearer)
         {
             httpClient.BaseAddress = new Uri("https://api.logmeal.es/v2/recognition/dish/v0.8?skip_types=%5B1%2C3%5D&language=eng");
             httpClient.DefaultRequestHeaders.Authorization =
-                 new AuthenticationHeaderValue("Bearer", Constants.Logmeal_bearer);
+                 new AuthenticationHeaderValue("Bearer", Logmeal_bearer);
         }
 
 

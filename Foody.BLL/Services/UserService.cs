@@ -1,21 +1,25 @@
 ﻿using Foody.DAL.Entities;
+using Foody.DAL.InnerExceptions;
 using Foody.DAL.Interfaces;
-using Foody.DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Foody.BLL
 {
     public class UserService
     {
-        IUnitOfWork Database;
+
+        IUnitOfWork unitOfWork;
+        
 
         public UserService(IUnitOfWork uow)
         {
-            Database = uow;
+            this.unitOfWork = uow;
         }
-        public void MakeUser(User User)
+        public void CreateUser(User User)
         {
             
             // validation
@@ -24,17 +28,17 @@ namespace Foody.BLL
             
             
             // creating
-            Database.Users.Create(User);
-            Database.Save();
+            unitOfWork.Users.Create(User);
+            unitOfWork.Save();
         }
 
-        public IEnumerable<Product> GetFavourites(User User)
+        public async Task<IEnumerable<Product>> GetFavourites(User User)
         {
             int id = Convert.ToInt32(User.Id);
             //validation
-            if (Database.Users.Get(id) != null)
+            if (unitOfWork.Users.Get(id) != null)
             {
-                var result = Database.Users.Favourites(id);
+                var result = await unitOfWork.Users.Favourites(id);
                 return result;
             }
             else { throw new EntryPointNotFoundException(); }
@@ -42,7 +46,7 @@ namespace Foody.BLL
 
 
         //getting user info by id
-        public User GetUser(int user_id)
+        public async Task<User> GetUser(int user_id)
         {
             // validation
             if (user_id == 0)
@@ -52,201 +56,139 @@ namespace Foody.BLL
             else
             {// reading
 
-                var user = Database.Users.Get(user_id);
+                var user = await unitOfWork.Users.Get(user_id);
                 return user;
             }
         }
 
-
-
-        ////adding users
-        [HttpPost("adduser")]
-        public async Task<IActionResult> AddUser([FromBody] User user)
-        {
-            if (user.ID != null && user.callories >= 300)
-            {
-
-                var findet = await _dbController.GetUserById(user.ID);
-                if (findet == null)
-                {
-
-                    var result = await _dbController.AddUser(user);
-                    return Ok("user has been added");
-                }
-                else
-                {
-                    return BadRequest("user already exist");
-                }
-
-            }
-            else
-            {
-                return BadRequest("not enough info");
-            }
-        }
-
-
-
         //Getting Statistics of user per days
-        [HttpGet("{user_id}/statistics/{days}")]
-        public async Task<IActionResult> GetStatistics(string user_id, int days)
+        public async Task<ICollection<DayIntake>> GetStatistics(string user_id, int days)
         {
-            if (user_id != null)
+            
+            var id = Convert.ToInt32(user_id);
+            var userStatistics = await unitOfWork.Users.Statistics(id);
+            if (userStatistics != null)
             {
-                var findet = await _dbController.GetUserById(user_id);
-                if (findet != null && findet.Favourite.Count > 0)
+                List<DayIntake> result = new List<DayIntake>();
+
+                foreach (var item in userStatistics)
                 {
-                    List<DayIntake> result = new List<DayIntake>();
-
-                    foreach (var item in findet.Statistics)
-                    {
-                        result.Add(item);
-                    }
-                    if (days > result.Count)
-                    {
-                        return Ok(result);
-                    }
-                    else
-                    {
-                        List<DayIntake> resulttosend = new List<DayIntake>();
-                        for (int i = 0; i < days; i++)
-                        {
-                            resulttosend.Add(result[0]);
-                        }
-                        return Ok(JsonSerializer.Serialize(resulttosend));
-
-                    }
-
-
+                    result.Add(item);
                 }
-                else if (findet != null && findet.Favourite.Count == 0)
+                if (days > result.Count)
                 {
-                    return NoContent();
+                    return result;
                 }
                 else
                 {
-                    return NotFound("user not found");
-                }
-            }
-            else
-            {
-                return BadRequest("no id");
-            }
-
-        }
-
-
-
-        //getting list of Favourite users products
-        [HttpGet("{user_id}/favourite")]
-        public async Task<IActionResult> Favourite(string user_id)
-        {
-            if (user_id != null)
-            {
-                var findet = await _dbController.GetUserById(user_id);
-                if (findet != null && findet.Favourite.Count > 0)
-                {
-                    List<Product> result = new List<Product>();
-
-                    foreach (var item in findet.Favourite)
+                    List<DayIntake> resultcutted = new List<DayIntake>();
+                    for (int i = 0; i < days; i++)
                     {
-                        result.Add(item);
+                        resultcutted.Add(result[0]);
                     }
+                    return resultcutted;
 
-                    return Ok(JsonSerializer.Serialize(result));
                 }
-                else if (findet != null && findet.Favourite.Count == 0)
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    return NotFound("user not found");
-                }
+
+
             }
             else
             {
-                return BadRequest("no id provided");
+                throw new NotFoundException("statistics", id);
             }
+            
+
         }
-
-
 
 
         //adding product to list of Favourite users products
-        [HttpPut("{user_id}/addproduct")]
-        public async Task<IActionResult> ProductAdd(string user_id, [FromBody] Product prdct)
+        public async Task<bool> ProductAdd(int user_id, Product prdct)
         {
-            if (user_id != null && prdct.Check())
+            if (!IsAnyNullOrEmpty(prdct))
             {
-                await _dbController.AddProduct(user_id, prdct);
-                return Ok("product has been added");
+                var user = await unitOfWork.Users.Get(user_id);
+                unitOfWork.Users.Update(user, prdct, true);
+                return true;
             }
             else
             {
-                return BadRequest();
+                return false;
             }
 
         }
 
 
         //removing product from list of Favourite users products
-        [HttpDelete("{user_id}/removeproduct")]
-        public async Task<IActionResult> ProductRemove(string user_id, [FromBody] Product prdct)
+        public async Task<bool> ProductRemove(int user_id, Product prdct)
         {
-            if (user_id != null && prdct.Check())
+            if (!IsAnyNullOrEmpty(prdct))
             {
-                await _dbController.RemoveProduct(user_id, prdct);
-                return Ok("product has been added");
+                var user = await unitOfWork.Users.Get(user_id);
+                unitOfWork.Users.Update(user, prdct, false);
+                return true;
             }
             else
             {
-                return BadRequest();
+                return false;
             }
         }
-
 
 
         //adding product to list of Favourite users products
-        [HttpPost("{user_id}/consume")]
-        public async Task<IActionResult> Consume(string user_id, [FromBody] Consume _new)
+        public async Task<bool> Consume(int user_id, double amount)
         {
-
-            await _dbController.ConsumeProduct(user_id, _new.callories, DateTime.Today);
-            return Ok("consumed");
+            if (amount>0)
+            {
+                await unitOfWork.Users.Consume(user_id, amount);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            
 
         }
 
-
-
-
-
-
-
         //removing users
-        [HttpDelete("{user_id}/removeuser")]
-        public async Task<IActionResult> RemoveUser(string user_id)
+        public async Task<bool> RemoveUser(int user_id)
         {
             if (user_id != null)
             {
-                var findet = await _dbController.GetUserById(user_id);
+                var findet = await unitOfWork.Users.Get(user_id);
                 if (findet != null)
                 {
-                    await _dbController.RemoveUser(user_id);
-                    return Ok("user has been removed");
+                    unitOfWork.Users.Delete(user_id);
+                    return true;
                 }
                 else
                 {
-                    return NotFound("user not found");
+                    return false;
                 }
             }
             else
             {
-                return BadRequest("id not provided");
+                throw new Exception("id not provided");
             }
 
         }
 
+
+        private bool IsAnyNullOrEmpty(object myObject)
+        {
+            foreach (PropertyInfo pi in myObject.GetType().GetProperties())
+            {
+                if (pi.PropertyType == typeof(string))
+                {
+                    string value = (string)pi.GetValue(myObject);
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
     }
 }

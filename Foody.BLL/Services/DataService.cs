@@ -1,5 +1,7 @@
 ﻿using Foody.BLL.Clients;
 using Foody.DAL.Interfaces;
+using FoodyAPI.Clients;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,109 +17,96 @@ namespace Foody.BLL.Services
         LogmealClient logmealClient;
         BarCodeClient barcodeClient;
 
-        public DataService(IUnitOfWork uow)
+        public DataService(IUnitOfWork uow, string barApiKey, string barApiToken, string Logmeal_bearer)
         {
             Database = uow;
 
-            logmealClient = new LogmealClient();
-            barcodeClient = new BarCodeClient();
+            logmealClient = new LogmealClient(Logmeal_bearer);
+            barcodeClient = new BarCodeClient(barApiKey, barApiToken);
         }
 
         //meal recognition without proper user info
-        public void Upload()
+        public void Upload(HttpRequest request)
         {
 
-                var file = Request.Form.Files[0];
+            var file = request.Form.Files[0];
 
-                var message = ph.FileUpload(file).Result;
-                if (message != "notOk")
-                {
-                    return Ok(message);
-                }
-                else
-                {
-                    return BadRequest();
-                }
+            PhotoHandling ph = new PhotoHandling();
+
+            var message = ph.FileUpload(file).Result;
+            if (message != "notOk")
+            {
+                
+            }
+            else
+            {
+                throw new Exception("BadRequest");
+            }
 
 
         }
 
 
-
-
         //meal info by name
-        [HttpGet("100g/{name}")]
-        public async Task<IActionResult> Consume100Info([FromQuery] string name)
+        public async Task<bool> Get100gInfo(string name)
         {
             if (name != null)
             {
-                var client = new BarCodeClient();
+
                 try
                 {
-                    var result = await client.Consume100Info(name);
+                    var result = await barcodeClient.Get100gInfo(name);
                     var _string = System.Text.Json.JsonSerializer.Serialize(result);
-                    return Ok(_string);
+                    return true;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
 
-                    return BadRequest("couldn't recognize it");
+                    throw new Exception( ex.Message + "\ncouldn't recognize it");
                 }
             }
             else
             {
-                return BadRequest("info not provided");
+                throw new Exception("info not provided");
             }
 
         }
 
 
         //info by barcode
-        [HttpGet("barcode")]
-        public async Task<IActionResult> BarcodeInfo([FromQuery] string barcode)
+        public async Task<bool> BarcodeInfo(string barcode)
         {
             if (barcode != null)
             {
-                var client = new BarCodeClient();
-                var result = await client.GetBarcodeInfo(barcode);
+                var result = await barcodeClient.GetBarcodeInfo(barcode);
                 var _string = System.Text.Json.JsonSerializer.Serialize(result);
-                return Ok(_string);
+                return true;
 
             }
             else
             {
-                return BadRequest("barcode not provided");
+                return false;
             }
 
         }
 
 
         //consuming 
-        [HttpPost("natural/{query}")]
-        public async Task<IActionResult> NaturalInfo(string query)
+        public async Task<bool> NaturalInfo(string query)
         {
             if (query != null)
             {
-                var client = new BarCodeClient();
                 try
                 {
-                    var result = await client.GetNaturalInfo(query);
+                    var result = await barcodeClient.GetNaturalInfo(query);
                     var _string = System.Text.Json.JsonSerializer.Serialize(result);
-                    return Ok(_string);
+                    return true;
                 }
                 catch
-                {
-
-                    return BadRequest("couldn't recognize it");
-                }
-
-
-
+                {throw new Exception("couldn't recognize it");}
             }
             else
-            {
-                return BadRequest("no info provided");
-            }
+            {throw new Exception("no info provided");}
 
         }
 

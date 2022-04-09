@@ -15,6 +15,12 @@ namespace Foody.DAL.Entities
         public double DayCalories { get; set; }
         public DateTime Date { get; set; }
 
+        public DayIntake(double callories)
+        {
+            DayCalories = callories;
+            Date = DateTime.Today;
+        }
+
         [JsonIgnore]
         public int? PointerId { get; set; }
         [JsonIgnore]
