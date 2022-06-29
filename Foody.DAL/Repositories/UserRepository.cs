@@ -19,30 +19,55 @@ namespace Foody.DAL.Repositories
             _context = context;
         }
 
-
-        public IEnumerable<User> GetAll()
+        public void SaveChanges()
         {
-            return _context.Users;
+            _context.SaveChanges();
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
+
+        //public UserRepository(APIContext dbContext) : base(dbContext)
+        //{
+        //}
+
+        public async Task<IEnumerable<User>> GetAll()
+        {
+            return await _context.Users.ToListAsync();
         }
         
-        public User Get(int id)
+        public async Task<User> Get(int id)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Id == id.ToString());
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id.ToString());
             return user;
 
         }
 
-        public IEnumerable<Product> Favourites(int id)
+        public async Task<IEnumerable<Product>> Favourites(int id)
         {
-            var user = Get(id);
+            var user = await Get(id);
             return user.Favourite;
 
         }
 
-        public IEnumerable<DayIntake> Statistics(int id)
+        public async Task<IEnumerable<DayIntake>> Statistics(int id)
         {
-            var user = Get(id);
+            var user = await Get(id);
             return user.Statistics;
+
+        }
+        public async Task<IEnumerable<DayIntake>> Consume(int id, double amount)
+        {
+            var user = await Get(id);
+            user.Statistics.Add(new DayIntake() { DayCalories = amount});
+            Update(user);
+            await _context.SaveChangesAsync();
+
+            return user.Statistics;
+            
 
         }
 
@@ -82,11 +107,11 @@ namespace Foody.DAL.Repositories
             Create(user);
         }
         
-        public void Delete(int id)
+        public async void Delete(int id)
         {
-            var user = Get(id);
+            var user = await Get(id);
             _context.Users.Remove(user);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
     }
 }

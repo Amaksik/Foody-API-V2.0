@@ -1,32 +1,39 @@
-﻿using Foody.BLL.Clients;
-using Foody.DAL.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using FoodyAPI.Models;
+using System.Drawing;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.IO;
+using System.Net.Http.Headers;
+using System.Net.Http;
+using FoodyAPI.Clients;
+using FoodyAPI.Data;
+using System.Text.Json;
 
-namespace Foody.BLL.Services
+namespace FoodyAPI.Controllers
 {
-    public class DataService
+    [ApiController]
+    [Route("api")]
+
+    public class MealsController : Controller
     {
-        IUnitOfWork Database;
-
-        LogmealClient logmealClient;
-        BarCodeClient barcodeClient;
-
-        public DataService(IUnitOfWork uow)
+        private static DbController _dbController;
+        public MealsController(DbController dbController)
         {
-            Database = uow;
-
-            logmealClient = new LogmealClient();
-            barcodeClient = new BarCodeClient();
+            _dbController = dbController;
         }
 
-        //meal recognition without proper user info
-        public void Upload()
-        {
 
+        //meal recognition without proper user info
+        [HttpPost("meal/recognize")]
+        public IActionResult Upload()
+        {
+            PhotoHandling ph = new PhotoHandling();
+            try
+            {
                 var file = Request.Form.Files[0];
 
                 var message = ph.FileUpload(file).Result;
@@ -38,15 +45,21 @@ namespace Foody.BLL.Services
                 {
                     return BadRequest();
                 }
+                
+                
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
 
 
         }
 
 
-
-
         //meal info by name
-        [HttpGet("100g/{name}")]
+        [HttpGet("meal/100g/{name}")]
         public async Task<IActionResult> Consume100Info([FromQuery] string name)
         {
             if (name != null)
@@ -72,28 +85,8 @@ namespace Foody.BLL.Services
         }
 
 
-        //info by barcode
-        [HttpGet("barcode")]
-        public async Task<IActionResult> BarcodeInfo([FromQuery] string barcode)
-        {
-            if (barcode != null)
-            {
-                var client = new BarCodeClient();
-                var result = await client.GetBarcodeInfo(barcode);
-                var _string = System.Text.Json.JsonSerializer.Serialize(result);
-                return Ok(_string);
-
-            }
-            else
-            {
-                return BadRequest("barcode not provided");
-            }
-
-        }
-
-
         //consuming 
-        [HttpPost("natural/{query}")]
+        [HttpPost("meal/natural/{query}")]
         public async Task<IActionResult> NaturalInfo(string query)
         {
             if (query != null)
@@ -110,8 +103,8 @@ namespace Foody.BLL.Services
 
                     return BadRequest("couldn't recognize it");
                 }
-
-
+                
+                
 
             }
             else
@@ -123,6 +116,24 @@ namespace Foody.BLL.Services
 
 
 
+        //info by barcode
+        [HttpGet("meal/barcode")]
+        public async Task<IActionResult> BarcodeInfo([FromQuery] string barcode)
+        {
+            if (barcode  != null)
+            {
+                var client = new BarCodeClient();
+                var result = await client.GetBarcodeInfo(barcode);
+                var _string = System.Text.Json.JsonSerializer.Serialize(result);
+                return Ok(_string);
+               
+            }
+            else
+            {
+                return BadRequest("barcode not provided");
+            }
+
+        }
 
     }
 }
