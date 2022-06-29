@@ -10,8 +10,9 @@ using System.IO;
 using System.Net.Http.Headers;
 using System.Net.Http;
 using FoodyAPI.Clients;
-using FoodyAPI.Data;
 using System.Text.Json;
+using Foody.BLL;
+using Foody.DAL.Entities;
 
 namespace Foody.PL.Controllers
 {
@@ -20,10 +21,10 @@ namespace Foody.PL.Controllers
 
     public class UsersServiceController : Controller
     {
-        private static DbController _dbController;
-        public UsersServiceController(DbController dbController)
+        private static IUserService _userService;
+        public UsersServiceController(IUserService userService)
         {
-            _dbController = dbController;
+            _userService = userService;
         }
 
 
@@ -33,7 +34,7 @@ namespace Foody.PL.Controllers
         {
             if (user_id != null)
             {
-                var findet = await _dbController.GetUserById(user_id);
+                var findet = await _userService.GetUser(Convert.ToInt32( user_id));
                 if (findet != null && findet.Favourite.Count > 0)
                 {
                     List<DayIntake> result = new List<DayIntake>();
@@ -82,7 +83,7 @@ namespace Foody.PL.Controllers
         {
             if (user_id != null)
             {
-                var findet = await _dbController.GetUserById(user_id);
+                var findet = await _userService.GetUser(Convert.ToInt32(user_id));
                 if (findet != null && findet.Favourite.Count>0)
                 {
                     List<Product> result = new List<Product>();
@@ -114,9 +115,9 @@ namespace Foody.PL.Controllers
         [HttpPost("users/{user_id}/favourite")]
         public async Task<IActionResult> ProductAdd(string user_id, [FromBody] Product prdct)
         {
-            if (user_id != null && prdct.Check())
+            if (user_id != null && !(prdct is null))
             {
-                await _dbController.AddProduct(user_id, prdct);
+                await _userService.AddProduct(Convert.ToInt32(user_id), prdct);
                 return Ok("product has been added");
             }
             else
@@ -131,9 +132,9 @@ namespace Foody.PL.Controllers
         [HttpDelete("users/{user_id}/favourite")]
         public async Task<IActionResult> ProductRemove(string user_id, [FromBody] Product prdct)
         {
-            if (user_id != null && prdct.Check())
+            if (user_id != null && !(prdct is null))
             {
-                await _dbController.RemoveProduct(user_id, prdct);
+                await _userService.RemoveProduct(Convert.ToInt32(user_id), prdct);
                 return Ok("product has been added");
             }
             else

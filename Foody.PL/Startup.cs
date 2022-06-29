@@ -1,9 +1,14 @@
+using Foody.BLL;
+using Foody.BLL.Services;
 using Foody.DAL.EF;
-using FoodyAPI.Controllers;
+using Foody.DAL.Interfaces;
+using Foody.DAL.Repositories;
+using Foody.PL.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,7 +34,29 @@ namespace Foody.PL
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddDbContext<APIContext>();
+
+
+            //// use in-memory database
+            //services.AddDbContext<AspnetRunContext>(c =>
+            //    c.UseInMemoryDatabase("AspnetRunConnection"));
+
+            // use real database
+            string mySqlConnectionStr = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<APIContext>(/*options => options.UseMySql(mySqlConnectionStr, 
+                                                                            ServerVersion.AutoDetect(mySqlConnectionStr))*/);
+
+            //services.AddDbContext<APIContext>(c =>
+            //    c.UseSqlServer(Configuration.GetConnectionString("AspnetRunConnection")));
+
+
+            //services.AddSingelton<UnitOfWork>(o => Configuration.GetConnectionString("ConnectionString"));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddOptions<DataServiceOptions>()
+                .Bind(Configuration.GetSection(DataServiceOptions.Tokens))
+                .ValidateDataAnnotations();
+
+            services.AddScoped<IDataService, DataService>();
             services.AddScoped<UsersController>();
             services.AddScoped<MealsController>();
             services.AddScoped<UsersServiceController>();
@@ -48,15 +75,6 @@ namespace Foody.PL
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FoodyAPI v1"));
-
-
-
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("v1/swagger.json", "My API V1"); //originally "./swagger/v1/swagger.json"
-            });
-
-
 
 
             if (env.IsDevelopment())

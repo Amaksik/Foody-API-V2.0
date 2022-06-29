@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Foody.BLL\BLL.csproj" />
-    <ProjectReference Include="..\Foody.DAL\DAL.csproj" />
+    <ProjectReference Include="..\DALn\DALn.csproj" />
   </ItemGroup>
 
 

@@ -1,6 +1,7 @@
 ﻿using Foody.DAL.EF;
 using Foody.DAL.Entities;
 using Foody.DAL.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +13,13 @@ namespace Foody.DAL.Repositories
     public class UnitOfWork : IUnitOfWork
     {
 
-        private APIContext dbcontext;
-        private UserRepository userRepository;
+        private IUserRepository userRepository;
+        //private IProductRepository userRepository;
 
-       //
-       public UnitOfWork(string connectionString)
+        //
+        public UnitOfWork(IUserRepository _userRepository)
        {
-            dbcontext = new APIContext(connectionString);
+            userRepository = _userRepository;
        }
         //
         public IUserRepository Users
@@ -26,14 +27,14 @@ namespace Foody.DAL.Repositories
             get
             {
                 if (userRepository == null)
-                    userRepository = new UserRepository(dbcontext);
+                    throw new DllNotFoundException();
                 return userRepository;
             }
         }
 
         public void Save()
         {
-            dbcontext.SaveChanges();
+            userRepository.SaveChanges();
         }
 
         private bool disposed = false;
@@ -44,7 +45,7 @@ namespace Foody.DAL.Repositories
             {
                 if (disposing)
                 {
-                    dbcontext.Dispose();
+                    userRepository.Dispose();
                 }
                 this.disposed = true;
             }

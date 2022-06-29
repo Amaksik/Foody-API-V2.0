@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BLL", "Foody.BLL\BLL.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Foody.PL", "Foody.PL\Foody.PL.csproj", "{BDDF39D0-A745-4CBD-BDA2-AA35918D591A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DALn", "DALn\DALn.csproj", "{5A307C7D-8FEE-426B-9194-60F44200EBE7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{BDDF39D0-A745-4CBD-BDA2-AA35918D591A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDDF39D0-A745-4CBD-BDA2-AA35918D591A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDDF39D0-A745-4CBD-BDA2-AA35918D591A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A307C7D-8FEE-426B-9194-60F44200EBE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A307C7D-8FEE-426B-9194-60F44200EBE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A307C7D-8FEE-426B-9194-60F44200EBE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A307C7D-8FEE-426B-9194-60F44200EBE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

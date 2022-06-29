@@ -22,5 +22,9 @@ namespace Foody.DAL.Interfaces
         void Update(User item, Product product, bool ToAdd);
         void Delete(int id);
 
+        void SaveChanges();
+        void Dispose();
+
+
     }
 }

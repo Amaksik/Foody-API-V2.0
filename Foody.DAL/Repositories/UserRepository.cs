@@ -19,6 +19,20 @@ namespace Foody.DAL.Repositories
             _context = context;
         }
 
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
+
+        //public UserRepository(APIContext dbContext) : base(dbContext)
+        //{
+        //}
+
         public async Task<IEnumerable<User>> GetAll()
         {
             return await _context.Users.ToListAsync();
@@ -48,9 +62,9 @@ namespace Foody.DAL.Repositories
         public async Task<IEnumerable<DayIntake>> Consume(int id, double amount)
         {
             var user = await Get(id);
-            user.Statistics.Add( new DayIntake(amount));
+            user.Statistics.Add(new DayIntake() { DayCalories = amount});
             Update(user);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return user.Statistics;
             

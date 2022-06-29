@@ -1,28 +1,39 @@
 ﻿using Foody.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-
-
 namespace Foody.DAL.EF
 {
 
     public class APIContext : DbContext
     {
-        //private string connectionString;
+        private string connectionString;
 
         public DbSet<User> Users { get; set; }
         public DbSet<Product> Products { get; set; }
 
-        public APIContext( string configurationConnectionString)
+        public DbSet<DayIntake> DayIntakes { get; set; }
+
+
+        public APIContext(DbContextOptions<APIContext> options)
+        : base(options)
         {
-            //connectionString = configurationConnectionString;
-            Database.EnsureCreated();
         }
+
+        //public APIContext()
+        //{
+        //}
+
+        //public APIContext()
+        //{
+        //    //connectionString = configurationConnectionString;
+        //    Database.EnsureCreated();
+        //}
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -37,25 +48,26 @@ namespace Foody.DAL.EF
             */
             optionsBuilder.UseMySql(
                 "server=sql11.freemysqlhosting.net;" +
-                "user=sql11484721;" +
-                "password=vTqsG1ZUmb;" +
-                "database=sql11484721;", 
+                "user=sql11498693;" +
+                "password=ehEr9WFBFW;" +
+                "database=sql11498693;",
                 new MySqlServerVersion(new Version(8, 0, 11))
                 );
-
-
-            // using configuraion
-            /*
-            optionsBuilder.UseMySql(
-                "server=sql103.epizy.com;" +
-                "user=epiz_31484356;" +
-                "password=foodyme123;" +
-                "database=epiz_31484356_foody;",
-                new MySqlServerVersion(new Version(8, 0, 11))
-                );
-            */
-
         }
+
+
+        //// using configuraion
+            ///*
+            //optionsBuilder.UseMySql(
+            //    "server=sql103.epizy.com;" +
+            //    "user=epiz_31484356;" +
+            //    "password=foodyme123;" +
+            //    "database=epiz_31484356_foody;",
+            //    new MySqlServerVersion(new Version(8, 0, 11))
+            //    );
+            //*/
+
+            //}
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -67,6 +79,31 @@ namespace Foody.DAL.EF
             modelBuilder.Entity<User>()
                 .HasMany(c => c.Statistics)
                 .WithOne(e => e.User);
+
+            modelBuilder.Entity<DayIntake>()
+                .HasOne(e => e.User)
+                .WithMany(c => c.Statistics);
+
+        }
+    }
+
+
+
+    class FoodyContextFactory : IDesignTimeDbContextFactory<APIContext>
+    {
+        public APIContext CreateDbContext(string[]? args = null)
+        {
+
+            var optionsBuilder = new DbContextOptionsBuilder<APIContext>();
+            optionsBuilder.UseMySql(
+            "server=sql103.epizy.com;" +
+            "user=epiz_31484356;" +
+            "password=foodyme123;" +
+            "database=epiz_31484356_foody;",
+            new MySqlServerVersion(new Version(8, 0, 11))
+            );
+
+            return new APIContext(optionsBuilder.Options);
         }
     }
 }

@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Foody.BLL
 {
-    public class UserService
+    public class UserService : IUserService
     {
 
         IUnitOfWork unitOfWork;
-        
+
 
         public UserService(IUnitOfWork uow)
         {
@@ -21,12 +21,12 @@ namespace Foody.BLL
         }
         public void CreateUser(User User)
         {
-            
+
             // validation
             if (User.Id == null || User.Callories == 0)
                 throw new ValidationException("Not enough info provided");
-            
-            
+
+
             // creating
             unitOfWork.Users.Create(User);
             unitOfWork.Save();
@@ -44,6 +44,12 @@ namespace Foody.BLL
             else { throw new EntryPointNotFoundException(); }
         }
 
+        //getting all users
+        public async Task<IEnumerable<User>> GetUsers()
+        {
+
+            return await unitOfWork.Users.GetAll();
+        }
 
         //getting user info by id
         public async Task<User> GetUser(int user_id)
@@ -61,10 +67,11 @@ namespace Foody.BLL
             }
         }
 
+        
         //Getting Statistics of user per days
         public async Task<ICollection<DayIntake>> GetStatistics(string user_id, int days)
         {
-            
+
             var id = Convert.ToInt32(user_id);
             var userStatistics = await unitOfWork.Users.Statistics(id);
             if (userStatistics != null)
@@ -96,13 +103,13 @@ namespace Foody.BLL
             {
                 throw new NotFoundException("statistics", id);
             }
-            
+
 
         }
 
 
         //adding product to list of Favourite users products
-        public async Task<bool> ProductAdd(int user_id, Product prdct)
+        public async Task<bool> AddProduct(int user_id, Product prdct)
         {
             if (!IsAnyNullOrEmpty(prdct))
             {
@@ -119,7 +126,7 @@ namespace Foody.BLL
 
 
         //removing product from list of Favourite users products
-        public async Task<bool> ProductRemove(int user_id, Product prdct)
+        public async Task<bool> RemoveProduct(int user_id, Product prdct)
         {
             if (!IsAnyNullOrEmpty(prdct))
             {
@@ -137,7 +144,7 @@ namespace Foody.BLL
         //adding product to list of Favourite users products
         public async Task<bool> Consume(int user_id, double amount)
         {
-            if (amount>0)
+            if (amount > 0)
             {
                 await unitOfWork.Users.Consume(user_id, amount);
                 return true;
@@ -146,7 +153,7 @@ namespace Foody.BLL
             {
                 return false;
             }
-            
+
 
         }
 

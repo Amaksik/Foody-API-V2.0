@@ -2,6 +2,7 @@
 using Foody.DAL.Interfaces;
 using FoodyAPI.Clients;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,19 +11,20 @@ using System.Threading.Tasks;
 
 namespace Foody.BLL.Services
 {
-    public class DataService
+    public class RecognitionService : IRecognitionService
     {
         IUnitOfWork Database;
 
-        LogmealClient logmealClient;
-        BarCodeClient barcodeClient;
-
-        public DataService(IUnitOfWork uow, string barApiKey, string barApiToken, string Logmeal_bearer)
+        private LogmealClient logmealClient;
+        private BarCodeClient barcodeClient;
+        private RecognitionServiceOptions _apiOptions;
+        public RecognitionService(IUnitOfWork uow, IOptionsSnapshot<RecognitionServiceOptions> apiOptions)
         {
             Database = uow;
+            _apiOptions = apiOptions.Value;
 
-            logmealClient = new LogmealClient(Logmeal_bearer);
-            barcodeClient = new BarCodeClient(barApiKey, barApiToken);
+            logmealClient = new LogmealClient(_apiOptions.LogmealApiBearer);
+            barcodeClient = new BarCodeClient(_apiOptions.BarcodeApiKey, _apiOptions.BarcodeApiToken);
         }
 
         //meal recognition without proper user info
@@ -36,7 +38,7 @@ namespace Foody.BLL.Services
             var message = ph.FileUpload(file).Result;
             if (message != "notOk")
             {
-                
+
             }
             else
             {
@@ -62,7 +64,7 @@ namespace Foody.BLL.Services
                 catch (Exception ex)
                 {
 
-                    throw new Exception( ex.Message + "\ncouldn't recognize it");
+                    throw new Exception(ex.Message + "\ncouldn't recognize it");
                 }
             }
             else
@@ -103,10 +105,10 @@ namespace Foody.BLL.Services
                     return true;
                 }
                 catch
-                {throw new Exception("couldn't recognize it");}
+                { throw new Exception("couldn't recognize it"); }
             }
             else
-            {throw new Exception("no info provided");}
+            { throw new Exception("no info provided"); }
 
         }
 

@@ -11,6 +11,7 @@ using System.Net.Http.Headers;
 using System.Net.Http;
 using FoodyAPI.Clients;
 using System.Text.Json;
+using Foody.BLL.Services;
 
 namespace Foody.PL.Controllers
 {
@@ -19,10 +20,10 @@ namespace Foody.PL.Controllers
 
     public class MealsController : Controller
     {
-        private static DbController _dbController;
-        public MealsController(DbController dbController)
+        private static IDataService _dataService;
+        public MealsController(IDataService dataService)
         {
-            _dbController = dbController;
+            _dataService = dataService;
         }
 
 
@@ -63,12 +64,11 @@ namespace Foody.PL.Controllers
         {
             if (name != null)
             {
-                var client = new BarCodeClient();
+                
                 try
                 {
-                    var result = await client.Consume100Info(name);
-                    var _string = System.Text.Json.JsonSerializer.Serialize(result);
-                    return Ok(_string);
+                    var result = await _dataService.Get100gInfo(name);
+                    return Ok(result);
                 }
                 catch (Exception)
                 {
@@ -90,12 +90,10 @@ namespace Foody.PL.Controllers
         {
             if (query != null)
             {
-                var client = new BarCodeClient();
                 try
                 {
-                    var result = await client.GetNaturalInfo(query);
-                    var _string = System.Text.Json.JsonSerializer.Serialize(result);
-                    return Ok(_string);
+                    var result = _dataService.NaturalInfo(query);
+                    return Ok(result);
                 }
                 catch
                 {
@@ -121,10 +119,8 @@ namespace Foody.PL.Controllers
         {
             if (barcode  != null)
             {
-                var client = new BarCodeClient();
-                var result = await client.GetBarcodeInfo(barcode);
-                var _string = System.Text.Json.JsonSerializer.Serialize(result);
-                return Ok(_string);
+                var result = _dataService.BarcodeInfo(barcode);
+                return Ok(result);
                
             }
             else

@@ -15,9 +15,8 @@ namespace Foody.DAL.Entities
         public double DayCalories { get; set; }
         public DateTime Date { get; set; }
 
-        public DayIntake(double callories)
+        public DayIntake()
         {
-            DayCalories = callories;
             Date = DateTime.Today;
         }
 
